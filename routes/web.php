@@ -17,6 +17,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\Admin\MailSettingsController;
 use App\Models\Post;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ApiTokenController;
 
 Route::get('/', [PostController::class, 'home'])->name('home');
 
@@ -42,6 +43,9 @@ Route::get('/posts', function () {
 Route::middleware(['auth', 'can:admin-access'])->prefix('admin-panel')->name('admin.')->group(function () {
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/api-tokens',            [ApiTokenController::class, 'index'])->name('api-tokens.index');
+    Route::post('/api-tokens',           [ApiTokenController::class, 'store'])->name('api-tokens.store');
+    Route::delete('/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
 
 
     Route::get('/posts/status/{status}', [AdminDashboardController::class, 'posts'])
