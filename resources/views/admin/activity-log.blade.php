@@ -4,8 +4,8 @@
 @section('content')
 @php
     $badge = fn ($a) => match (true) {
-        str_ends_with($a, 'approved') => 'success',
-        str_ends_with($a, 'rejected'), str_ends_with($a, 'deleted') => 'danger',
+        str_ends_with($a, 'approved'), $a === 'token.created' => 'success',
+        str_ends_with($a, 'rejected'), str_ends_with($a, 'deleted'), $a === 'token.revoked' => 'danger',
         str_starts_with($a, 'auth.')  => 'secondary',
         default                       => 'primary',
     };
@@ -19,10 +19,11 @@
     <div class="row g-2">
         <div class="col-md-3">
             <select name="type" class="form-select" onchange="this.form.submit()">
-                <option value="all"  @selected($type === 'all')>All activity</option>
-                <option value="post" @selected($type === 'post')>Posts</option>
-                <option value="user" @selected($type === 'user')>Users</option>
-                <option value="auth" @selected($type === 'auth')>Logins</option>
+                <option value="all"   @selected($type === 'all')>All activity</option>
+                <option value="post"  @selected($type === 'post')>Posts</option>
+                <option value="user"  @selected($type === 'user')>Users</option>
+                <option value="auth"  @selected($type === 'auth')>Logins</option>
+                <option value="token" @selected($type === 'token')>API tokens</option>
             </select>
         </div>
         <div class="col-md-7">

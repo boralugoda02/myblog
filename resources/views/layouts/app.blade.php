@@ -224,8 +224,7 @@
                         <i class="bi bi-gear me-3"></i> SMTP Settings
                     </a>
                 </li>
-                {{-- API Tokens --}}
-                <li class="nav-item">
+                                <li class="nav-item">
                     <a href="{{ route('admin.api-tokens.index') }}"
                        class="nav-link {{ request()->routeIs('admin.api-tokens.*') ? 'active' : '' }}">
                         <i class="bi bi-key me-3"></i> API Tokens

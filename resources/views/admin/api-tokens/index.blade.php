@@ -1,6 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    
+    .modal-content {
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+        border-color: var(--border-color);
+    }
+    .modal-header, .modal-footer { border-color: var(--border-color); }
+    [data-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+</style>
+
 <div class="container-fluid py-4">
 
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
@@ -70,14 +81,12 @@
                                 @endif
                             </td>
                             <td class="text-end pe-4">
-                                <form method="POST" action="{{ route('admin.api-tokens.destroy', $t->id) }}"
-                                      onsubmit="return confirm('Revoke this token? Apps using it will stop working.')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i> Revoke
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        data-bs-toggle="modal" data-bs-target="#revokeModal"
+                                        data-name="{{ $t->name }}"
+                                        data-action="{{ route('admin.api-tokens.destroy', $t->id) }}">
+                                    <i class="bi bi-trash"></i> Revoke
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -112,7 +121,7 @@ Authorization: Bearer YOUR_TOKEN</code></pre>
 {{-- Create token popup --}}
 <div class="modal fade" id="createTokenModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <form method="POST" action="{{ route('admin.api-tokens.store') }}" class="modal-content">
+        <form method="POST" action="{{ route('admin.api-tokens.store') }}" class="modal-content border-0 shadow">
             @csrf
             <div class="modal-header">
                 <h5 class="modal-title fw-bold">Create API token</h5>
@@ -144,4 +153,45 @@ Authorization: Bearer YOUR_TOKEN</code></pre>
         </form>
     </div>
 </div>
+
+{{-- Revoke token popup --}}
+<div class="modal fade" id="revokeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="revokeForm" method="POST" action="#" class="modal-content border-0 shadow">
+            @csrf
+            @method('DELETE')
+            <div class="modal-body text-center p-4">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger-subtle text-danger mb-3"
+                     style="width:64px;height:64px;font-size:1.8rem;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Revoke this token?</h5>
+                <p class="mb-1">
+                    <span class="badge bg-primary-subtle text-primary fs-6" id="revokeName"></span>
+                </p>
+                <p class="text-muted mb-0">
+                    Apps that use this token will stop working immediately.
+                    This cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger px-4">
+                    <i class="bi bi-trash me-1"></i> Yes, revoke
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    
+    document.getElementById('revokeModal').addEventListener('show.bs.modal', function (event) {
+        const btn = event.relatedTarget;
+        document.getElementById('revokeForm').action = btn.getAttribute('data-action');
+        document.getElementById('revokeName').textContent = btn.getAttribute('data-name');
+    });
+</script>
+@endpush

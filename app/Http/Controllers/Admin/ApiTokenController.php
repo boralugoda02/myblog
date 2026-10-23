@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class ApiTokenController extends Controller
@@ -26,6 +27,13 @@ class ApiTokenController extends Controller
         $token = $request->user()->createToken($data['name'], ['*'], $expiresAt);
 
         
+        ActivityLog::record(
+            'token.created',
+            $request->user()->name . ' created API token "' . $data['name'] . '"'
+                . ($expiresAt ? ' (expires ' . $expiresAt->format('M d, Y') . ')' : ' (never expires)')
+        );
+
+        
         return redirect()->route('admin.api-tokens.index')
             ->with('new_token', $token->plainTextToken);
     }
@@ -33,7 +41,18 @@ class ApiTokenController extends Controller
     public function destroy(Request $request, int $token)
     {
         
-        $request->user()->tokens()->whereKey($token)->delete();
+        $row = $request->user()->tokens()->whereKey($token)->first();
+
+        if ($row) {
+            $name = $row->name;
+            $row->delete();
+
+            
+            ActivityLog::record(
+                'token.revoked',
+                $request->user()->name . ' revoked API token "' . $name . '"'
+            );
+        }
 
         return redirect()->route('admin.api-tokens.index');
     }

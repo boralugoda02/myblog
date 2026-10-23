@@ -43,9 +43,6 @@ Route::get('/posts', function () {
 Route::middleware(['auth', 'can:admin-access'])->prefix('admin-panel')->name('admin.')->group(function () {
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/api-tokens',            [ApiTokenController::class, 'index'])->name('api-tokens.index');
-    Route::post('/api-tokens',           [ApiTokenController::class, 'store'])->name('api-tokens.store');
-    Route::delete('/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
 
 
     Route::get('/posts/status/{status}', [AdminDashboardController::class, 'posts'])
@@ -59,6 +56,10 @@ Route::middleware(['auth', 'can:admin-access'])->prefix('admin-panel')->name('ad
     Route::patch('/users/{user}/role',     [AdminDashboardController::class, 'updateRole'])->name('users.role');
     Route::patch('/users/{user}/ban',      [AdminDashboardController::class, 'banUser'])->name('users.ban');
     Route::delete('/users/{user}/delete',  [AdminDashboardController::class, 'deleteUser'])->name('users.delete');
+
+        Route::get('/api-tokens',            [ApiTokenController::class, 'index'])->name('api-tokens.index');
+    Route::post('/api-tokens',           [ApiTokenController::class, 'store'])->name('api-tokens.store');
+    Route::delete('/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
 
 
     // Activity log <-- NEW
